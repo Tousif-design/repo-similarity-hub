@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GitBranch, GitFork, Star, Eye, Code, BookOpen, GitPullRequest, GitCommit, FileText, Download, Upload } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import Navbar from "@/components/Navbar";
 import FileTree from "@/components/FileTree";
 import CodeViewer from "@/components/CodeViewer";
