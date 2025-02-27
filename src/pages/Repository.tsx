@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -20,9 +19,7 @@ const Repository = () => {
   const [selectedPath, setSelectedPath] = useState("");
   const [fileContent, setFileContent] = useState<string | null>(null);
   
-  // Mock repository data
   useEffect(() => {
-    // In a real application, this would be an API call
     setTimeout(() => {
       setRepository({
         name: name || "unnamed-repo",
@@ -66,6 +63,18 @@ const Repository = () => {
   const handleFileSelect = (path: string, content: string) => {
     setSelectedPath(path);
     setFileContent(content);
+  };
+
+  const handleStar = () => {
+    console.log('Star clicked');
+  };
+
+  const handleFork = () => {
+    console.log('Fork clicked');
+  };
+
+  const handleWatch = () => {
+    console.log('Watch clicked');
   };
 
   if (loading) {
@@ -120,19 +129,19 @@ const Repository = () => {
           <p className="text-gray-600 mb-4">{repository.description}</p>
           
           <div className="flex flex-wrap gap-4">
-            <Button variant="outline" className="flex items-center gap-2 text-sm">
+            <Button variant="outline" className="flex items-center gap-2 text-sm" onClick={handleStar}>
               <Star className="w-4 h-4" />
               <span>Star</span>
               <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.stars}</span>
             </Button>
             
-            <Button variant="outline" className="flex items-center gap-2 text-sm">
+            <Button variant="outline" className="flex items-center gap-2 text-sm" onClick={handleFork}>
               <GitFork className="w-4 h-4" />
               <span>Fork</span>
               <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.forks}</span>
             </Button>
             
-            <Button variant="outline" className="flex items-center gap-2 text-sm">
+            <Button variant="outline" className="flex items-center gap-2 text-sm" onClick={handleWatch}>
               <Eye className="w-4 h-4" />
               <span>Watch</span>
               <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.watchers}</span>
@@ -142,11 +151,17 @@ const Repository = () => {
         
         <div className="mb-6 border-b border-gray-200">
           <div className="flex overflow-auto hide-scrollbar">
-            <Link to={`/repository/${owner}/${name}`} className="px-4 py-3 border-b-2 border-blue-600 text-blue-600 font-medium flex items-center gap-2">
+            <Link 
+              to={`/repository/${owner}/${name}`} 
+              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
+            >
               <Code className="w-4 h-4" />
               <span>Code</span>
             </Link>
-            <Link to={`/repository/${owner}/${name}/issues`} className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2">
+            <Link 
+              to={`/repository/${owner}/${name}/issues`} 
+              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -155,12 +170,18 @@ const Repository = () => {
               <span>Issues</span>
               <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.issues}</span>
             </Link>
-            <Link to={`/repository/${owner}/${name}/pull-requests`} className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2">
+            <Link 
+              to={`/repository/${owner}/${name}/pull-requests`} 
+              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
+            >
               <GitPullRequest className="w-4 h-4" />
               <span>Pull Requests</span>
               <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.pullRequests}</span>
             </Link>
-            <Link to={`/repository/${owner}/${name}/actions`} className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2">
+            <Link 
+              to={`/repository/${owner}/${name}/actions`} 
+              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 3v18h18"></path>
                 <path d="M18.4 9.6L8.5 11.4 6 16"></path>
@@ -168,7 +189,10 @@ const Repository = () => {
               </svg>
               <span>Actions</span>
             </Link>
-            <Link to={`/repository/${owner}/${name}/projects`} className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2">
+            <Link 
+              to={`/repository/${owner}/${name}/projects`} 
+              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="2"></rect>
                 <line x1="3" y1="9" x2="21" y2="9"></line>
@@ -176,7 +200,10 @@ const Repository = () => {
               </svg>
               <span>Projects</span>
             </Link>
-            <Link to={`/repository/${owner}/${name}/wiki`} className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2">
+            <Link 
+              to={`/repository/${owner}/${name}/wiki`} 
+              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
+            >
               <BookOpen className="w-4 h-4" />
               <span>Wiki</span>
             </Link>
