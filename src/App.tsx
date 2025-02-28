@@ -14,6 +14,7 @@ import PullRequests from "./pages/repository/PullRequests";
 import Actions from "./pages/repository/Actions";
 import Projects from "./pages/repository/Projects";
 import Wiki from "./pages/repository/Wiki";
+import Explore from "./pages/Explore";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/explore" element={<Explore />} />
             <Route path="/repository/:owner/:name" element={<Repository />} />
             <Route path="/repository/:owner/:name/issues" element={<Issues />} />
             <Route path="/repository/:owner/:name/pull-requests" element={<PullRequests />} />
