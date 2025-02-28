@@ -36,14 +36,22 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/repository/:owner/:name" element={<Repository />} />
             <Route path="/repository/:owner/:name/issues" element={<Issues />} />
+            <Route path="/repository/:owner/:name/issues/:id" element={<Issues />} />
             <Route path="/repository/:owner/:name/pull-requests" element={<PullRequests />} />
+            <Route path="/repository/:owner/:name/pull-requests/:id" element={<PullRequests />} />
             <Route path="/repository/:owner/:name/actions" element={<Actions />} />
             <Route path="/repository/:owner/:name/projects" element={<Projects />} />
+            <Route path="/repository/:owner/:name/projects/:id" element={<Projects />} />
             <Route path="/repository/:owner/:name/wiki" element={<Wiki />} />
             <Route path="/new" element={<NewRepository />} />
-            {/* Redirect /docs to /documentation for common url pattern */}
+            {/* Redirect common URL patterns */}
             <Route path="/docs" element={<Navigate to="/documentation" replace />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/repositories" element={<Navigate to="/explore" replace />} />
+            <Route path="/repo/:owner/:name/*" element={<Navigate to="/repository/:owner/:name/*" replace />} />
+            <Route path="/user/:username" element={<Navigate to="/profile" replace />} />
+            <Route path="/stars" element={<Navigate to="/profile" replace />} />
+            <Route path="/projects" element={<Navigate to="/profile" replace />} />
+            {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

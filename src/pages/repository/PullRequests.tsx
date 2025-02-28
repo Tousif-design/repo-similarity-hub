@@ -1,7 +1,8 @@
 
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import RepositoryNavigation from "@/components/RepositoryNavigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { GitPullRequest, MessageSquare, Check, X, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 const PullRequests = () => {
   const { owner, name } = useParams();
@@ -18,7 +20,7 @@ const PullRequests = () => {
 
   useEffect(() => {
     // Simulate API call
-    setTimeout(() => {
+    const loadData = setTimeout(() => {
       setPullRequests([
         {
           id: 1,
@@ -108,7 +110,13 @@ const PullRequests = () => {
       ]);
       setLoading(false);
     }, 800);
+
+    return () => clearTimeout(loadData);
   }, [owner, name]);
+
+  const handleNewPullRequest = () => {
+    toast.success("New pull request creation would be implemented in a production app");
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -176,12 +184,26 @@ const PullRequests = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <GitPullRequest className="w-5 h-5 text-gray-600" />
+            <Link to={`/profile`} className="text-blue-600 hover:underline">
+              {owner}
+            </Link>
+            <span className="text-gray-600">/</span>
+            <Link to={`/repository/${owner}/${name}`} className="text-blue-600 hover:underline">
+              {name}
+            </Link>
+          </div>
+        </div>
+        
+        <RepositoryNavigation />
+        
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold mb-1">Pull Requests</h1>
-            <p className="text-gray-600">Repository: {owner}/{name}</p>
           </div>
-          <Button className="bg-green-600 hover:bg-green-700">
+          <Button className="bg-green-600 hover:bg-green-700" onClick={handleNewPullRequest}>
             New Pull Request
           </Button>
         </div>
@@ -189,7 +211,12 @@ const PullRequests = () => {
         <Card>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <Tabs defaultValue="open" onValueChange={setActiveTab} className="w-full">
+              <Tabs 
+                defaultValue="open" 
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="w-full"
+              >
                 <TabsList className="grid w-full max-w-md grid-cols-4">
                   <TabsTrigger value="open">
                     Open ({pullRequests.filter(pr => pr.status === "open").length})
@@ -225,7 +252,11 @@ const PullRequests = () => {
                       <div className="mr-3 mt-1">{getStatusIcon(pr.status)}</div>
                       <div className="flex-1">
                         <div className="flex items-baseline">
-                          <h3 className="text-lg font-medium text-blue-600 hover:underline mr-2">{pr.title}</h3>
+                          <h3 className="text-lg font-medium text-blue-600 hover:underline mr-2">
+                            <Link to={`/repository/${owner}/${name}/pull-requests/${pr.number}`}>
+                              {pr.title}
+                            </Link>
+                          </h3>
                           <span className="text-sm text-gray-500">#{pr.number}</span>
                         </div>
                         <div className="text-sm text-gray-600 mt-1">
