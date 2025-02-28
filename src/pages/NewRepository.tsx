@@ -7,14 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
-import { GitBranch, GitFork, GitMerge } from "lucide-react";
+import { GitBranch } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
+import { useUser } from "@/contexts/UserContext";
 
 const NewRepository = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { addRepository } = useUser();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [visibility, setVisibility] = useState("public");
@@ -38,15 +39,32 @@ const NewRepository = () => {
     
     setIsSubmitting(true);
     
-    // Simulate API call
+    // Create repository object
+    const newRepository = {
+      id: `username-${name}`,
+      name: name,
+      owner: "username",
+      description: description || "No description provided",
+      createdAt: new Date().toISOString(),
+      stars: 0,
+      forks: 0,
+      watchers: 0,
+      isPublic: visibility === "public"
+    };
+    
+    // Add to recent repositories
+    addRepository(newRepository);
+    
+    // Show toast
+    toast({
+      title: "Repository created",
+      description: `${name} has been successfully created.`,
+    });
+    
+    // Navigate to new repository page
     setTimeout(() => {
-      toast({
-        title: "Repository created",
-        description: `${name} has been successfully created.`,
-      });
-      
       navigate(`/repository/username/${name}`);
-    }, 1500);
+    }, 1000);
   };
   
   return (

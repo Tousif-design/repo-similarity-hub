@@ -1,27 +1,40 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GitBranch, GitFork, Star, Eye, Code, BookOpen, GitPullRequest, GitCommit, FileText, Download, Upload } from "lucide-react";
+import { 
+  GitBranch, GitFork, Star, Eye, Code, BookOpen, GitPullRequest, 
+  GitCommit, FileText, Download, Upload, Terminal
+} from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
 import Navbar from "@/components/Navbar";
 import FileTree from "@/components/FileTree";
 import CodeViewer from "@/components/CodeViewer";
+import TerminalCommandInput from "@/components/TerminalCommandInput";
+import BranchManager from "@/components/BranchManager";
+import { useUser } from "@/contexts/UserContext";
 
 const Repository = () => {
   const { owner, name } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { addRepository } = useUser();
   const [repository, setRepository] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedBranch, setSelectedBranch] = useState("main");
   const [selectedPath, setSelectedPath] = useState("");
   const [fileContent, setFileContent] = useState<string | null>(null);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [activeTab, setActiveTab] = useState("code");
   
   useEffect(() => {
     setTimeout(() => {
-      setRepository({
+      const repo = {
+        id: `${owner}-${name}`,
         name: name || "unnamed-repo",
         owner: owner || "unknown",
         description: "A modern repository for building amazing software with collaboration.",
@@ -33,6 +46,11 @@ const Repository = () => {
         lastUpdated: "2 days ago",
         issues: 24,
         pullRequests: 7,
+        isStarred: false,
+        isForked: false,
+        isWatched: false,
+        createdAt: new Date().toISOString(),
+        isPublic: true,
         readme: "# Project Overview\nThis is a sample README file that would typically contain project documentation.\n\n## Getting Started\n\n```\nnpm install\nnpm start\n```\n\n## Features\n\n- Feature 1\n- Feature 2\n- Feature 3\n",
         fileStructure: [
           { name: "src", type: "folder", children: [
@@ -55,10 +73,26 @@ const Repository = () => {
           { name: "README.md", type: "file", content: "# Project Overview\nThis is a sample README file that would typically contain project documentation.\n\n## Getting Started\n\n```\nnpm install\nnpm start\n```\n\n## Features\n\n- Feature 1\n- Feature 2\n- Feature 3\n" },
           { name: ".gitignore", type: "file", content: "# dependencies\n/node_modules\n\n# production\n/build\n\n# misc\n.DS_Store\n.env.local\n.env\n\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*" }
         ]
+      };
+      
+      setRepository(repo);
+      
+      // Add to recent repositories
+      addRepository({
+        id: repo.id,
+        name: repo.name,
+        owner: repo.owner,
+        description: repo.description,
+        createdAt: repo.createdAt,
+        stars: repo.stars,
+        forks: repo.forks,
+        watchers: repo.watchers,
+        isPublic: repo.isPublic
       });
+      
       setLoading(false);
     }, 500);
-  }, [owner, name]);
+  }, [owner, name, addRepository]);
 
   const handleFileSelect = (path: string, content: string) => {
     setSelectedPath(path);
@@ -66,15 +100,60 @@ const Repository = () => {
   };
 
   const handleStar = () => {
-    console.log('Star clicked');
+    setRepository((prev: any) => ({
+      ...prev,
+      stars: prev.isStarred ? prev.stars - 1 : prev.stars + 1,
+      isStarred: !prev.isStarred
+    }));
+    
+    toast({
+      title: repository?.isStarred ? "Repository unstarred" : "Repository starred",
+      description: repository?.isStarred 
+        ? `You have removed your star from ${owner}/${name}` 
+        : `You have starred ${owner}/${name}`
+    });
   };
 
   const handleFork = () => {
-    console.log('Fork clicked');
+    setRepository((prev: any) => ({
+      ...prev,
+      forks: prev.isForked ? prev.forks : prev.forks + 1,
+      isForked: true
+    }));
+    
+    toast({
+      title: "Repository forked",
+      description: `${owner}/${name} has been forked to your account`
+    });
+    
+    // Simulate navigation to forked repo
+    setTimeout(() => {
+      navigate(`/repository/username/${name}`);
+    }, 1500);
   };
 
   const handleWatch = () => {
-    console.log('Watch clicked');
+    setRepository((prev: any) => ({
+      ...prev,
+      watchers: prev.isWatched ? prev.watchers - 1 : prev.watchers + 1,
+      isWatched: !prev.isWatched
+    }));
+    
+    toast({
+      title: repository?.isWatched ? "Unwatched repository" : "Watching repository",
+      description: repository?.isWatched 
+        ? `You are no longer watching ${owner}/${name}` 
+        : `You are now watching ${owner}/${name}`
+    });
+  };
+  
+  const handleAddBranch = (branch: string) => {
+    if (repository) {
+      setRepository((prev: any) => ({
+        ...prev,
+        branches: [...prev.branches, branch]
+      }));
+    }
   };
 
   if (loading) {
@@ -123,92 +202,138 @@ const Repository = () => {
             </Link>
             <span className="text-gray-600">/</span>
             <h1 className="text-xl font-bold">{repository.name}</h1>
-            <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Public</span>
+            <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+              {repository.isPublic ? "Public" : "Private"}
+            </span>
           </div>
           
           <p className="text-gray-600 mb-4">{repository.description}</p>
           
           <div className="flex flex-wrap gap-4">
-            <Button variant="outline" className="flex items-center gap-2 text-sm" onClick={handleStar}>
-              <Star className="w-4 h-4" />
-              <span>Star</span>
+            <Button 
+              variant="outline" 
+              className={`flex items-center gap-2 text-sm ${repository.isStarred ? 'bg-yellow-50' : ''}`} 
+              onClick={handleStar}
+            >
+              <Star className={`w-4 h-4 ${repository.isStarred ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+              <span>{repository.isStarred ? "Starred" : "Star"}</span>
               <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.stars}</span>
             </Button>
             
-            <Button variant="outline" className="flex items-center gap-2 text-sm" onClick={handleFork}>
+            <Button 
+              variant="outline" 
+              className={`flex items-center gap-2 text-sm ${repository.isForked ? 'bg-blue-50' : ''}`} 
+              onClick={handleFork}
+              disabled={repository.isForked}
+            >
               <GitFork className="w-4 h-4" />
-              <span>Fork</span>
+              <span>{repository.isForked ? "Forked" : "Fork"}</span>
               <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.forks}</span>
             </Button>
             
-            <Button variant="outline" className="flex items-center gap-2 text-sm" onClick={handleWatch}>
+            <Button 
+              variant="outline" 
+              className={`flex items-center gap-2 text-sm ${repository.isWatched ? 'bg-blue-50' : ''}`} 
+              onClick={handleWatch}
+            >
               <Eye className="w-4 h-4" />
-              <span>Watch</span>
+              <span>{repository.isWatched ? "Watching" : "Watch"}</span>
               <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.watchers}</span>
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 text-sm ml-auto"
+              onClick={() => setShowTerminal(!showTerminal)}
+            >
+              <Terminal className="w-4 h-4" />
+              <span>{showTerminal ? "Hide Terminal" : "Terminal"}</span>
             </Button>
           </div>
         </div>
         
         <div className="mb-6 border-b border-gray-200">
-          <div className="flex overflow-auto hide-scrollbar">
-            <Link 
-              to={`/repository/${owner}/${name}`} 
-              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
-            >
-              <Code className="w-4 h-4" />
-              <span>Code</span>
-            </Link>
-            <Link 
-              to={`/repository/${owner}/${name}/issues`} 
-              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-              <span>Issues</span>
-              <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.issues}</span>
-            </Link>
-            <Link 
-              to={`/repository/${owner}/${name}/pull-requests`} 
-              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
-            >
-              <GitPullRequest className="w-4 h-4" />
-              <span>Pull Requests</span>
-              <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.pullRequests}</span>
-            </Link>
-            <Link 
-              to={`/repository/${owner}/${name}/actions`} 
-              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 3v18h18"></path>
-                <path d="M18.4 9.6L8.5 11.4 6 16"></path>
-                <path d="M18.4 9.6L8.5 7.8l-2.5 4.4"></path>
-              </svg>
-              <span>Actions</span>
-            </Link>
-            <Link 
-              to={`/repository/${owner}/${name}/projects`} 
-              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                <line x1="3" y1="9" x2="21" y2="9"></line>
-                <line x1="9" y1="21" x2="9" y2="9"></line>
-              </svg>
-              <span>Projects</span>
-            </Link>
-            <Link 
-              to={`/repository/${owner}/${name}/wiki`} 
-              className="px-4 py-3 border-b-2 border-transparent hover:border-gray-300 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2"
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>Wiki</span>
-            </Link>
-          </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full flex overflow-auto hide-scrollbar justify-start h-auto bg-transparent border-b border-gray-200 rounded-none p-0">
+              <TabsTrigger
+                value="code"
+                className="px-4 py-3 border-b-2 border-transparent data-[state=active]:border-blue-500 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent"
+              >
+                <Code className="w-4 h-4" />
+                <span>Code</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="issues"
+                className="px-4 py-3 border-b-2 border-transparent data-[state=active]:border-blue-500 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent"
+                onClick={() => navigate(`/repository/${owner}/${name}/issues`)}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>Issues</span>
+                <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.issues}</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="pull-requests"
+                className="px-4 py-3 border-b-2 border-transparent data-[state=active]:border-blue-500 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent"
+                onClick={() => navigate(`/repository/${owner}/${name}/pull-requests`)}
+              >
+                <GitPullRequest className="w-4 h-4" />
+                <span>Pull Requests</span>
+                <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-gray-100">{repository.pullRequests}</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="actions"
+                className="px-4 py-3 border-b-2 border-transparent data-[state=active]:border-blue-500 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent"
+                onClick={() => navigate(`/repository/${owner}/${name}/actions`)}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 3v18h18"></path>
+                  <path d="M18.4 9.6L8.5 11.4 6 16"></path>
+                  <path d="M18.4 9.6L8.5 7.8l-2.5 4.4"></path>
+                </svg>
+                <span>Actions</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="projects"
+                className="px-4 py-3 border-b-2 border-transparent data-[state=active]:border-blue-500 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent"
+                onClick={() => navigate(`/repository/${owner}/${name}/projects`)}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                  <line x1="3" y1="9" x2="21" y2="9"></line>
+                  <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+                <span>Projects</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="wiki"
+                className="px-4 py-3 border-b-2 border-transparent data-[state=active]:border-blue-500 text-gray-600 hover:text-gray-900 transition-colors duration-200 flex items-center gap-2 data-[state=active]:text-blue-600 data-[state=active]:bg-transparent"
+                onClick={() => navigate(`/repository/${owner}/${name}/wiki`)}
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>Wiki</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
+        
+        {showTerminal && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+              <Terminal className="w-5 h-5" />
+              Terminal
+            </h3>
+            <TerminalCommandInput 
+              currentRepository={{ owner: repository.owner, name: repository.name }}
+              currentBranch={selectedBranch}
+              onBranchChange={setSelectedBranch}
+              onAddBranch={handleAddBranch}
+            />
+          </div>
+        )}
         
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -272,55 +397,68 @@ const Repository = () => {
           </div>
         </div>
         
-        <Card className="border border-gray-200 overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-4">
-            <div className="p-4 border-r border-gray-200 md:col-span-1 overflow-auto max-h-[70vh]">
-              <FileTree 
-                files={repository.fileStructure} 
-                onFileSelect={handleFileSelect}
-              />
-            </div>
-            
-            <div className="p-4 md:col-span-3 overflow-auto max-h-[70vh]">
-              {selectedPath ? (
-                <CodeViewer path={selectedPath} content={fileContent || ""} />
-              ) : (
-                <div className="prose max-w-none">
-                  <h2 className="flex items-center gap-2 text-xl font-bold mb-4">
-                    <FileText className="w-5 h-5" />
-                    README.md
-                  </h2>
-                  <div className="p-4 rounded-md border border-gray-200 bg-gray-50">
-                    {repository.readme.split('\n').map((line: string, i: number) => (
-                      <div key={i} className="mb-1">
-                        {line.startsWith('#') ? (
-                          <h1 className="text-xl font-bold">{line.replace('# ', '')}</h1>
-                        ) : line.startsWith('##') ? (
-                          <h2 className="text-lg font-bold mt-4">{line.replace('## ', '')}</h2>
-                        ) : line.startsWith('```') ? (
-                          <pre className="bg-gray-100 p-3 rounded-md mt-2 mb-2 overflow-x-auto">
-                            <code>{i+1 < repository.readme.split('\n').length && 
-                              !repository.readme.split('\n')[i+1].startsWith('```') ? 
-                              repository.readme.split('\n').slice(i+1, 
-                                repository.readme.split('\n').findIndex((l: string, idx: number) => idx > i && l.startsWith('```'))
-                              ).join('\n') : ''}
-                            </code>
-                          </pre>
-                        ) : line.startsWith('-') ? (
-                          <li className="ml-4">{line.replace('- ', '')}</li>
-                        ) : line.trim() === '' ? (
-                          <br />
-                        ) : !line.startsWith('```') ? (
-                          <p>{line}</p>
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-1">
+            <BranchManager 
+              branches={repository.branches}
+              currentBranch={selectedBranch}
+              onAddBranch={handleAddBranch}
+              onChangeBranch={setSelectedBranch}
+            />
           </div>
-        </Card>
+          
+          <div className="lg:col-span-3">
+            <Card className="border border-gray-200 overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-4">
+                <div className="p-4 border-r border-gray-200 md:col-span-1 overflow-auto max-h-[70vh]">
+                  <FileTree 
+                    files={repository.fileStructure} 
+                    onFileSelect={handleFileSelect}
+                  />
+                </div>
+                
+                <div className="p-4 md:col-span-3 overflow-auto max-h-[70vh]">
+                  {selectedPath ? (
+                    <CodeViewer path={selectedPath} content={fileContent || ""} />
+                  ) : (
+                    <div className="prose max-w-none">
+                      <h2 className="flex items-center gap-2 text-xl font-bold mb-4">
+                        <FileText className="w-5 h-5" />
+                        README.md
+                      </h2>
+                      <div className="p-4 rounded-md border border-gray-200 bg-gray-50">
+                        {repository.readme.split('\n').map((line: string, i: number) => (
+                          <div key={i} className="mb-1">
+                            {line.startsWith('#') ? (
+                              <h1 className="text-xl font-bold">{line.replace('# ', '')}</h1>
+                            ) : line.startsWith('##') ? (
+                              <h2 className="text-lg font-bold mt-4">{line.replace('## ', '')}</h2>
+                            ) : line.startsWith('```') ? (
+                              <pre className="bg-gray-100 p-3 rounded-md mt-2 mb-2 overflow-x-auto">
+                                <code>{i+1 < repository.readme.split('\n').length && 
+                                  !repository.readme.split('\n')[i+1].startsWith('```') ? 
+                                  repository.readme.split('\n').slice(i+1, 
+                                    repository.readme.split('\n').findIndex((l: string, idx: number) => idx > i && l.startsWith('```'))
+                                  ).join('\n') : ''}
+                                </code>
+                              </pre>
+                            ) : line.startsWith('-') ? (
+                              <li className="ml-4">{line.replace('- ', '')}</li>
+                            ) : line.trim() === '' ? (
+                              <br />
+                            ) : !line.startsWith('```') ? (
+                              <p>{line}</p>
+                            ) : null}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
       </main>
       
       <footer className="border-t border-gray-200 py-6 px-4 mt-8">
