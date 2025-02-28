@@ -15,6 +15,8 @@ import Actions from "./pages/repository/Actions";
 import Projects from "./pages/repository/Projects";
 import Wiki from "./pages/repository/Wiki";
 import Explore from "./pages/Explore";
+import Trending from "./pages/Trending";
+import Documentation from "./pages/Documentation";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +30,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/explore" element={<Explore />} />
+            <Route path="/trending" element={<Trending />} />
+            <Route path="/documentation" element={<Documentation />} />
             <Route path="/repository/:owner/:name" element={<Repository />} />
             <Route path="/repository/:owner/:name/issues" element={<Issues />} />
             <Route path="/repository/:owner/:name/pull-requests" element={<PullRequests />} />
