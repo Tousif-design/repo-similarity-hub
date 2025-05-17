@@ -3,7 +3,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/contexts/UserContext";
 import { Card } from "@/components/ui/card";
-import { GitBranch, GitFork, Star } from "lucide-react";
+import { GitBranch, GitFork, Star, Eye, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const RecentRepositories = () => {
   const { recentRepositories } = useUser();
@@ -14,40 +15,77 @@ const RecentRepositories = () => {
   }
 
   return (
-    <div className="mt-6">
-      <h2 className="text-xl font-semibold mb-4">Recent Repositories</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <section className="mt-10">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold">Recent Repositories</h2>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="text-sm border-gray-300"
+          onClick={() => navigate("/repositories")}
+        >
+          View all <ArrowRight className="ml-1 h-3 w-3" />
+        </Button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {recentRepositories.map((repo) => (
           <Card 
             key={repo.id} 
-            className="p-4 hover:shadow-md transition-shadow cursor-pointer border-gray-200"
+            className="p-5 hover:shadow-md transition-all cursor-pointer border-gray-200 hover:border-orange-200"
             onClick={() => navigate(`/repository/${repo.owner}/${repo.name}`)}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <GitBranch className="w-4 h-4 text-gray-600" />
-              <span className="text-blue-600 font-medium">{repo.owner}/{repo.name}</span>
+            <div className="flex items-center gap-2 mb-3">
+              <GitBranch className="w-4 h-4 text-orange-500" />
+              <span className="text-blue-600 font-medium hover:underline">
+                {repo.owner}/{repo.name}
+              </span>
               <span className="ml-auto px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
                 {repo.isPublic ? "Public" : "Private"}
               </span>
             </div>
-            <p className="text-gray-600 text-sm mb-3 line-clamp-2">{repo.description}</p>
-            <div className="flex items-center gap-4 text-xs text-gray-500">
+            
+            <p className="text-gray-600 text-sm mb-4 min-h-[40px] line-clamp-2">
+              {repo.description || "No description provided"}
+            </p>
+            
+            <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
+              {repo.language && (
+                <span className="flex items-center gap-1.5">
+                  <span className={`w-2.5 h-2.5 rounded-full bg-${
+                    repo.language === "JavaScript" ? "yellow" : 
+                    repo.language === "TypeScript" ? "blue" : 
+                    repo.language === "Python" ? "green" : "gray"
+                  }-500`}></span>
+                  {repo.language}
+                </span>
+              )}
+              
               <span className="flex items-center gap-1">
-                <Star className="w-3 h-3" />
-                {repo.stars}
+                <Star className="w-3.5 h-3.5" />
+                {repo.stars.toLocaleString()}
               </span>
+              
               <span className="flex items-center gap-1">
-                <GitFork className="w-3 h-3" />
-                {repo.forks}
+                <GitFork className="w-3.5 h-3.5" />
+                {repo.forks.toLocaleString()}
               </span>
-              <span className="ml-auto text-xs">
-                Created on {new Date(repo.createdAt).toLocaleDateString()}
+              
+              {repo.watchers && (
+                <span className="flex items-center gap-1">
+                  <Eye className="w-3.5 h-3.5" />
+                  {repo.watchers.toLocaleString()}
+                </span>
+              )}
+              
+              <span className="ml-auto text-xs text-gray-400">
+                Updated {new Date(repo.updatedAt || repo.createdAt).toLocaleDateString()}
               </span>
             </div>
           </Card>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 

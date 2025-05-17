@@ -50,14 +50,23 @@ const App = () => (
             <Route path="/repository/:owner/:name/projects" element={<Projects />} />
             <Route path="/repository/:owner/:name/projects/:id" element={<Projects />} />
             <Route path="/repository/:owner/:name/wiki" element={<Wiki />} />
+            <Route path="/repository/:owner/:name/security" element={<NotFound />} />
             <Route path="/new" element={<NewRepository />} />
+            <Route path="/notifications" element={<NotFound />} />
+            <Route path="/import" element={<NotFound />} />
+            <Route path="/gist/new" element={<NotFound />} />
+            <Route path="/organizations/new" element={<NotFound />} />
+            <Route path="/project/new" element={<NotFound />} />
+            <Route path="/settings" element={<NotFound />} />
+            <Route path="/repositories" element={<Navigate to="/profile" replace />} />
+            
             {/* Redirect common URL patterns */}
             <Route path="/docs" element={<Navigate to="/documentation" replace />} />
-            <Route path="/repositories" element={<Navigate to="/explore" replace />} />
             <Route path="/repo/:owner/:name/*" element={<Navigate to="/repository/:owner/:name/*" replace />} />
             <Route path="/user/:username" element={<Navigate to="/profile" replace />} />
             <Route path="/stars" element={<Navigate to="/profile" replace />} />
             <Route path="/projects" element={<Navigate to="/profile" replace />} />
+            
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
