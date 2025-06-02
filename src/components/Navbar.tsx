@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -85,32 +84,41 @@ const Navbar = () => {
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 focus:bg-gray-100" href="/docs">
+                          <Link 
+                            to="/actions" 
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 focus:bg-gray-100"
+                          >
                             <div className="text-sm font-medium leading-none">Actions</div>
                             <p className="line-clamp-2 text-sm leading-snug text-gray-500">
                               Automate your workflow with CI/CD.
                             </p>
-                          </a>
+                          </Link>
                         </NavigationMenuLink>
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 focus:bg-gray-100" href="/docs">
+                          <Link 
+                            to="/packages" 
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 focus:bg-gray-100"
+                          >
                             <div className="text-sm font-medium leading-none">Packages</div>
                             <p className="line-clamp-2 text-sm leading-snug text-gray-500">
                               Host and manage packages for your projects.
                             </p>
-                          </a>
+                          </Link>
                         </NavigationMenuLink>
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 focus:bg-gray-100" href="/docs">
+                          <Link 
+                            to="/security" 
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-gray-100 focus:bg-gray-100"
+                          >
                             <div className="text-sm font-medium leading-none">Security</div>
                             <p className="line-clamp-2 text-sm leading-snug text-gray-500">
                               Keep your code secure and compliant.
                             </p>
-                          </a>
+                          </Link>
                         </NavigationMenuLink>
                       </li>
                     </ul>

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,6 +21,9 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import ActionsPage from "./pages/Actions";
+import PackagesPage from "./pages/Packages";
+import SecurityPage from "./pages/Security";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -60,6 +64,11 @@ const App = () => (
             <Route path="/organizations/new" element={<NotFound />} />
             <Route path="/project/new" element={<NotFound />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/actions" element={<ActionsPage />} />
+            <Route path="/packages" element={<PackagesPage />} />
+            <Route path="/security" element={<SecurityPage />} />
             <Route path="/repositories" element={<Navigate to="/profile" replace />} />
             
             {/* Redirect common URL patterns */}

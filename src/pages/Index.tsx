@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -211,14 +210,14 @@ const Index = () => {
                     onClick={() => navigate('/new')}
                     className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-8 py-3 h-auto text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   >
-                    Create your first repository
+                    <span className="text-white">Create your first repository</span>
                   </Button>
                   <Button 
                     variant="outline" 
                     onClick={() => navigate('/explore')}
-                    className="border-2 border-white/20 text-white hover:bg-white hover:text-gray-900 font-semibold px-8 py-3 h-auto text-lg rounded-lg transition-all duration-300"
+                    className="border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white hover:text-gray-900 font-semibold px-8 py-3 h-auto text-lg rounded-lg transition-all duration-300"
                   >
-                    Explore open source
+                    <span>Explore open source</span>
                   </Button>
                 </div>
               </div>
