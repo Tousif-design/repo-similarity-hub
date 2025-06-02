@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +17,9 @@ import Explore from "./pages/Explore";
 import Trending from "./pages/Trending";
 import Documentation from "./pages/Documentation";
 import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,7 +59,7 @@ const App = () => (
             <Route path="/gist/new" element={<NotFound />} />
             <Route path="/organizations/new" element={<NotFound />} />
             <Route path="/project/new" element={<NotFound />} />
-            <Route path="/settings" element={<NotFound />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="/repositories" element={<Navigate to="/profile" replace />} />
             
             {/* Redirect common URL patterns */}

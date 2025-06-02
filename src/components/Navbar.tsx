@@ -20,7 +20,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle
 } from "@/components/ui/navigation-menu";
-import { Bell, Plus, GitBranch, Star, Book, Code, GitPullRequest, Search } from "lucide-react";
+import { Bell, Plus, GitBranch, Star, Book, Code, GitPullRequest, Search, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Navbar = () => {
@@ -33,7 +33,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4 py-3 max-w-6xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link to="/" className="font-semibold text-xl text-gray-900 flex items-center gap-2">
+            <Link to="/" className="font-semibold text-xl text-gray-900 flex items-center gap-2 hover:text-orange-600 transition-colors">
               <GitBranch className="h-6 w-6 text-orange-500" />
               <span>RepoHub</span>
             </Link>
@@ -50,7 +50,21 @@ const Navbar = () => {
             <NavigationMenu className="hidden md:flex">
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700">Product</NavigationMenuTrigger>
+                  <Link 
+                    to="/" 
+                    className={cn(
+                      navigationMenuTriggerStyle(), 
+                      "text-gray-700 hover:text-orange-600 flex items-center gap-2",
+                      location.pathname === "/" && "text-orange-600 bg-orange-50"
+                    )}
+                  >
+                    <Home className="w-4 h-4" />
+                    Home
+                  </Link>
+                </NavigationMenuItem>
+                
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-orange-600">Product</NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4">
                       <li className="row-span-3">
@@ -102,13 +116,29 @@ const Navbar = () => {
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
+                
                 <NavigationMenuItem>
-                  <Link to="/explore" className={cn(navigationMenuTriggerStyle(), "text-gray-700")}>
+                  <Link 
+                    to="/explore" 
+                    className={cn(
+                      navigationMenuTriggerStyle(), 
+                      "text-gray-700 hover:text-orange-600",
+                      location.pathname === "/explore" && "text-orange-600 bg-orange-50"
+                    )}
+                  >
                     Explore
                   </Link>
                 </NavigationMenuItem>
+                
                 <NavigationMenuItem>
-                  <Link to="/trending" className={cn(navigationMenuTriggerStyle(), "text-gray-700")}>
+                  <Link 
+                    to="/trending" 
+                    className={cn(
+                      navigationMenuTriggerStyle(), 
+                      "text-gray-700 hover:text-orange-600",
+                      location.pathname === "/trending" && "text-orange-600 bg-orange-50"
+                    )}
+                  >
                     Trending
                   </Link>
                 </NavigationMenuItem>
@@ -121,7 +151,7 @@ const Navbar = () => {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
+                className="text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-colors duration-200"
                 onClick={() => navigate("/notifications")}
               >
                 <Bell className="h-5 w-5" />
@@ -132,7 +162,7 @@ const Navbar = () => {
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
+                    className="text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-colors duration-200"
                   >
                     <Plus className="h-5 w-5" />
                   </Button>
@@ -196,14 +226,14 @@ const Navbar = () => {
             <div className="flex items-center gap-3">
               <Button 
                 variant="ghost" 
-                className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
-                onClick={() => setIsLoggedIn(true)}
+                className="text-gray-600 hover:text-orange-600 hover:bg-orange-50 transition-colors duration-200"
+                onClick={() => navigate("/signin")}
               >
                 Sign in
               </Button>
               <Button 
                 className="bg-orange-500 hover:bg-orange-600 text-white transition-colors duration-200"
-                onClick={() => setIsLoggedIn(true)}
+                onClick={() => navigate("/signup")}
               >
                 Sign up
               </Button>
