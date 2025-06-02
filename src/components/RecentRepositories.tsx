@@ -32,11 +32,11 @@ const RecentRepositories = () => {
         {recentRepositories.map((repo) => (
           <Card 
             key={repo.id} 
-            className="p-5 hover:shadow-md transition-all cursor-pointer border-gray-200 hover:border-orange-200"
+            className="p-5 hover:shadow-md transition-all cursor-pointer border-gray-200 hover:border-blue-200"
             onClick={() => navigate(`/repository/${repo.owner}/${repo.name}`)}
           >
             <div className="flex items-center gap-2 mb-3">
-              <GitBranch className="w-4 h-4 text-orange-500" />
+              <GitBranch className="w-4 h-4 text-blue-500" />
               <span className="text-blue-600 font-medium hover:underline">
                 {repo.owner}/{repo.name}
               </span>
@@ -50,17 +50,6 @@ const RecentRepositories = () => {
             </p>
             
             <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
-              {repo.language && (
-                <span className="flex items-center gap-1.5">
-                  <span className={`w-2.5 h-2.5 rounded-full bg-${
-                    repo.language === "JavaScript" ? "yellow" : 
-                    repo.language === "TypeScript" ? "blue" : 
-                    repo.language === "Python" ? "green" : "gray"
-                  }-500`}></span>
-                  {repo.language}
-                </span>
-              )}
-              
               <span className="flex items-center gap-1">
                 <Star className="w-3.5 h-3.5" />
                 {repo.stars.toLocaleString()}
@@ -79,7 +68,7 @@ const RecentRepositories = () => {
               )}
               
               <span className="ml-auto text-xs text-gray-400">
-                Updated {new Date(repo.updatedAt || repo.createdAt).toLocaleDateString()}
+                Updated {new Date(repo.createdAt).toLocaleDateString()}
               </span>
             </div>
           </Card>
